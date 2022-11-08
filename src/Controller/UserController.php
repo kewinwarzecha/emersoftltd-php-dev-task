@@ -50,9 +50,6 @@ class UserController extends RestAbstractController
 
         $this->validate($user);
 
-        $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
-        $user->setPassword($hashedPassword);
-
         $userRepository->save($user, true);
 
         return $this->objectResponse(
@@ -78,13 +75,10 @@ class UserController extends RestAbstractController
     public function update(UserRepository $userRepository, Request $request, UserPasswordHasherInterface $passwordHasher): Response {
         $loggedUser = $this->getUser();
 
-        $requestContentRaw = $request->getContent();
-        $requestContent = json_decode($requestContentRaw);
-
         try{
             /** @var User $user */
             $user = $this->serializer->deserialize(
-                $requestContentRaw,
+                $request->getContent(),
                 User::class,
                 JsonEncoder::FORMAT,
                 [
@@ -94,11 +88,6 @@ class UserController extends RestAbstractController
             );
         } catch (NotNormalizableValueException $exception) {
             throw new BadRequestHttpException($exception->getMessage());
-        }
-
-        if (isset($requestContent->password)) {
-            $hashedPassword = $passwordHasher->hashPassword($user, $requestContent->password);
-            $user->setPassword($hashedPassword);
         }
 
         $this->validate($user);

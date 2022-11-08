@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -38,11 +39,17 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Constraints\Type(type: Types::STRING)]
     #[Constraints\Length(min:8, max: 255)]
     #[Constraints\NotBlank(allowNull: false, groups: [UserGroups::CREATE])]
+    private ?string $password = null;
+
+    #[Constraints\Type(type: Types::STRING)]
+    #[Constraints\Length(min:8, max: 255)]
+    #[Constraints\NotBlank(allowNull: false, groups: [UserGroups::CREATE])]
     #[Groups([
         UserGroups::CREATE,
         UserGroups::UPDATE,
     ])]
-    private ?string $password = null;
+    #[SerializedName('password')]
+    private ?string $plainPassword = null;
 
     #[ORM\Column(length: 180)]
     #[Constraints\Type(type: Types::STRING)]
@@ -118,6 +125,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }
