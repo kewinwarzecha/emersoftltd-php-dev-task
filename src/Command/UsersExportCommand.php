@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 #[AsCommand(
@@ -78,6 +79,9 @@ class UsersExportCommand extends Command
         $fileEntity->setPath($filePath);
 
         $this->csvFileRepository->save($fileEntity, true);
+
+        $io = new SymfonyStyle($input, $output);
+        $io->success('The list has been saved in the file: ' . $filePath);
 
         return Command::SUCCESS;
     }
